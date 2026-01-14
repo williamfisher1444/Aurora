@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora — Генератор Северного Сияния</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --aurora-green: #00ff88;
+            --aurora-blue: #00aaff;
+            --aurora-purple: #8855ff;
+            --aurora-pink: #ff44aa;
+            --night-dark: #0a0a12;
+            --night-mid: #12121f;
+            --snow-white: #e8eef5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--night-dark);
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--snow-white);
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--base-opacity); transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(40px);
+            opacity: 0.8;
+        }
+
+        .aurora-wave {
+            position: absolute;
+            width: 200%;
+            height: 300px;
+            left: -50%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--aurora-green),
+                var(--aurora-blue),
+                var(--aurora-purple),
+                var(--aurora-green),
+                transparent
+            );
+            opacity: 0.6;
+            animation: wave var(--speed) ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .aurora-wave:nth-child(1) {
+            top: 5%;
+            --speed: 8s;
+            animation-delay: 0s;
+        }
+
+        .aurora-wave:nth-child(2) {
+            top: 15%;
+            --speed: 12s;
+            animation-delay: -2s;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--aurora-blue),
+                var(--aurora-purple),
+                var(--aurora-pink),
+                var(--aurora-blue),
+                transparent
+            );
+        }
+
+        .aurora-wave:nth-child(3) {
+            top: 25%;
+            --speed: 10s;
+            animation-delay: -4s;
+            opacity: 0.4;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateX(-10%) scaleY(1) rotate(-2deg);
+            }
+            25% {
+                transform: translateX(5%) scaleY(1.3) rotate(1deg);
+            }
+            50% {
+                transform: translateX(10%) scaleY(0.8) rotate(2deg);
+            }
+            75% {
+                transform: translateX(-5%) scaleY(1.1) rotate(-1deg);
+            }
+        }
+
+        .mountains {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .mountain {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .mountain-1 {
+            left: -5%;
+            border-width: 0 200px 280px 250px;
+            border-color: transparent transparent #0f0f1a transparent;
+        }
+
+        .mountain-2 {
+            left: 15%;
+            border-width: 0 180px 350px 220px;
+            border-color: transparent transparent #0d0d18 transparent;
+        }
+
+        .mountain-3 {
+            left: 45%;
+            border-width: 0 250px 300px 200px;
+            border-color: transparent transparent #101020 transparent;
+        }
+
+        .mountain-4 {
+            right: -5%;
+            border-width: 0 220px 380px 280px;
+            border-color: transparent transparent #0e0e1c transparent;
+        }
+
+        .snow-ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(to bottom, #1a1a2e, #252540);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(
+                135deg,
+                var(--aurora-green),
+                var(--aurora-blue),
+                var(--aurora-purple)
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 4s ease-in-out infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3)); }
+            50% { filter: drop-shadow(0 0 40px rgba(136, 85, 255, 0.5)); }
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 300;
+            color: rgba(232, 238, 245, 0.5);
+            letter-spacing: 0.5em;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .control-group:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .control-label {
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(232, 238, 245, 0.4);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 150px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--aurora-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--aurora-green);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px var(--aurora-green);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .color-btn::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-btn:hover::after,
+        .color-btn.active::after {
+            border-color: currentColor;
+        }
+
+        .color-btn.green { background: var(--aurora-green); color: var(--aurora-green); }
+        .color-btn.blue { background: var(--aurora-blue); color: var(--aurora-blue); }
+        .color-btn.purple { background: var(--aurora-purple); color: var(--aurora-purple); }
+        .color-btn.pink { background: var(--aurora-pink); color: var(--aurora-pink); }
+
+        .info-panel {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: rgba(232, 238, 245, 0.3);
+            letter-spacing: 0.2em;
+            z-index: 5;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .coordinates {
+            margin-top: 0.5rem;
+            color: var(--aurora-green);
+            opacity: 0.6;
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: particleFade 2s ease-out forwards;
+            z-index: 5;
+        }
+
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-100px);
+            }
+        }
+
+        .shooting-star {
+            position: fixed;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, white);
+            animation: shoot 1s ease-out forwards;
+            z-index: 3;
+        }
+
+        @keyframes shoot {
+            0% {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(300px) translateY(200px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .control-group {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .info-panel {
+                bottom: 0.8rem;
+                font-size: 0.55rem;
+                padding: 0 1rem;
+            }
+        }
+        
+        /* Mobile touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .control-group {
+                padding: 1.5rem 1.8rem;
+            }
+            
+            .slider {
+                height: 6px;
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .slider::-webkit-slider-thumb {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .color-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .color-options {
+                gap: 1.2rem;
+            }
+            
+            h1 {
+                font-size: clamp(2rem, 10vw, 4rem);
+                letter-spacing: 0.15em;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+                letter-spacing: 0.2em;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="aurora-container" id="aurora">
+        <div class="aurora-wave"></div>
+        <div class="aurora-wave"></div>
+        <div class="aurora-wave"></div>
+    </div>
+
+    <div class="mountains">
+        <div class="mountain mountain-1"></div>
+        <div class="mountain mountain-2"></div>
+        <div class="mountain mountain-3"></div>
+        <div class="mountain mountain-4"></div>
+        <div class="snow-ground"></div>
+    </div>
+
+    <div class="content">
+        <h1>Aurora</h1>
+        <p class="subtitle">Генератор северного сияния</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">Интенсивность</label>
+                <input type="range" class="slider" id="intensity" min="0" max="100" value="60">
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Скорость волн</label>
+                <input type="range" class="slider" id="speed" min="0" max="100" value="50">
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Палитра</label>
+                <div class="color-options">
+                    <button class="color-btn green active" data-scheme="green"></button>
+                    <button class="color-btn blue" data-scheme="blue"></button>
+                    <button class="color-btn purple" data-scheme="purple"></button>
+                    <button class="color-btn pink" data-scheme="pink"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div>Кликните в любом месте для создания частиц</div>
+        <div class="coordinates" id="coords">68.9585° N, 33.0827° E — Мурманск</div>
+    </div>
+
+    <script>
+        // Generate stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 60 + '%';
+            const size = Math.random() * 2 + 1;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            star.style.setProperty('--base-opacity', Math.random() * 0.5 + 0.2);
+            star.style.animationDelay = Math.random() * 5 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Aurora controls
+        const aurora = document.getElementById('aurora');
+        const waves = document.querySelectorAll('.aurora-wave');
+        
+        document.getElementById('intensity').addEventListener('input', (e) => {
+            const value = e.target.value / 100;
+            aurora.style.opacity = 0.3 + value * 0.7;
+            aurora.style.filter = `blur(${30 + (1 - value) * 20}px)`;
+        });
+
+        document.getElementById('speed').addEventListener('input', (e) => {
+            const value = e.target.value;
+            const baseSpeed = 15 - (value / 100) * 10;
+            waves.forEach((wave, i) => {
+                wave.style.animationDuration = (baseSpeed + i * 2) + 's';
+            });
+        });
+
+        // Color schemes
+        const colorSchemes = {
+            green: {
+                primary: '#00ff88',
+                secondary: '#00aaff',
+                tertiary: '#8855ff'
+            },
+            blue: {
+                primary: '#00aaff',
+                secondary: '#0066ff',
+                tertiary: '#00ddff'
+            },
+            purple: {
+                primary: '#8855ff',
+                secondary: '#aa44ff',
+                tertiary: '#ff44aa'
+            },
+            pink: {
+                primary: '#ff44aa',
+                secondary: '#ff6688',
+                tertiary: '#ffaa44'
+            }
+        };
+
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            // Handle both click and touch
+            const handleColorChange = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const scheme = colorSchemes[btn.dataset.scheme];
+                waves[0].style.background = `linear-gradient(90deg, transparent, ${scheme.primary}, ${scheme.secondary}, ${scheme.tertiary}, ${scheme.primary}, transparent)`;
+                waves[1].style.background = `linear-gradient(90deg, transparent, ${scheme.secondary}, ${scheme.tertiary}, ${scheme.primary}, ${scheme.secondary}, transparent)`;
+                waves[2].style.background = `linear-gradient(90deg, transparent, ${scheme.tertiary}, ${scheme.primary}, ${scheme.secondary}, ${scheme.tertiary}, transparent)`;
+                
+                document.documentElement.style.setProperty('--aurora-green', scheme.primary);
+            };
+            
+            btn.addEventListener('click', handleColorChange);
+            btn.addEventListener('touchend', handleColorChange);
+        });
+
+        // Particle effect on click (but not on controls)
+        document.addEventListener('click', (e) => {
+            // Don't create particles when clicking controls
+            if (e.target.closest('.controls') || e.target.closest('.color-btn') || e.target.closest('button')) {
+                return;
+            }
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 8 + 4;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = e.clientX + (Math.random() - 0.5) * 40 + 'px';
+                particle.style.top = e.clientY + (Math.random() - 0.5) * 40 + 'px';
+                
+                const colors = ['#00ff88', '#00aaff', '#8855ff', '#ff44aa'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
+                
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        });
+
+        // Random shooting stars
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = Math.random() * 50 + '%';
+            star.style.top = Math.random() * 30 + '%';
+            star.style.transform = `rotate(${30 + Math.random() * 20}deg)`;
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 1000);
+        }
+
+        setInterval(() => {
+            if (Math.random() > 0.7) createShootingStar();
+        }, 3000);
+
+        // Update coordinates randomly
+        const locations = [
+            { name: 'Мурманск', coords: '68.9585° N, 33.0827° E' },
+            { name: 'Тромсё', coords: '69.6492° N, 18.9553° E' },
+            { name: 'Рейкьявик', coords: '64.1466° N, 21.9426° W' },
+            { name: 'Фэрбанкс', coords: '64.8378° N, 147.7164° W' },
+            { name: 'Кируна', coords: '67.8558° N, 20.2253° E' }
+        ];
+
+        let locIndex = 0;
+        setInterval(() => {
+            locIndex = (locIndex + 1) % locations.length;
+            const loc = locations[locIndex];
+            document.getElementById('coords').textContent = `${loc.coords} — ${loc.name}`;
+        }, 8000);
+
+        // ==========================================
+        // MOBILE DEVICE MOTION & ORIENTATION SUPPORT
+        // ==========================================
+        
+        let motionEnabled = false;
+        let orientationEnabled = false;
+        
+        // Smooth interpolation values
+        let currentTiltX = 0;
+        let currentTiltY = 0;
+        let targetTiltX = 0;
+        let targetTiltY = 0;
+        
+        // Check if device supports motion
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isSamsung = /Samsung|SM-/i.test(navigator.userAgent);
+        
+        // Debug indicator
+        const debugInfo = document.createElement('div');
+        debugInfo.id = 'debug-info';
+        debugInfo.style.cssText = `
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: #00ff88;
+            z-index: 2000;
+            display: none;
+            line-height: 1.4;
+        `;
+        document.body.appendChild(debugInfo);
+        
+        // Show debug on triple tap
+        let tapCount = 0;
+        let tapTimer = null;
+        document.addEventListener('touchend', () => {
+            tapCount++;
+            clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+                if (tapCount >= 3) {
+                    debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+                }
+                tapCount = 0;
+            }, 400);
+        });
+        
+        function updateDebug(text) {
+            debugInfo.innerHTML = text;
+        }
+        
+        // Create motion indicator
+        const motionIndicator = document.createElement('div');
+        motionIndicator.id = 'motion-indicator';
+        motionIndicator.innerHTML = `
+            <div class="motion-icon" style="font-size: 1.2rem;">📱</div>
+            <div class="motion-text">Наклоняйте устройство</div>
+            <div class="motion-status" style="font-size: 0.5rem; opacity: 0.6;">ожидание...</div>
+        `;
+        motionIndicator.style.cssText = `
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--aurora-green);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        `;
+        document.body.appendChild(motionIndicator);
+        
+        function updateMotionStatus(status) {
+            const statusEl = motionIndicator.querySelector('.motion-status');
+            if (statusEl) statusEl.textContent = status;
+        }
+        
+        // iOS requires permission request (iOS 13+)
+        async function requestMotionPermission() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && 
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        enableMotionListeners();
+                        return true;
+                    } else {
+                        updateMotionStatus('доступ запрещён');
+                    }
+                } catch (e) {
+                    console.log('Motion permission error:', e);
+                    updateMotionStatus('ошибка: ' + e.message);
+                }
+                return false;
+            } else {
+                // Android or older iOS - no permission needed
+                enableMotionListeners();
+                return true;
+            }
+        }
+        
+        // Create permission button for iOS
+        if (isMobile && isIOS) {
+            const permissionBtn = document.createElement('button');
+            permissionBtn.id = 'motion-permission-btn';
+            permissionBtn.innerHTML = '📱 Включить гироскоп';
+            permissionBtn.style.cssText = `
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 170, 255, 0.2));
+                border: 1px solid rgba(0, 255, 136, 0.4);
+                border-radius: 12px;
+                padding: 0.8rem 1.2rem;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.7rem;
+                color: var(--snow-white);
+                z-index: 1001;
+                cursor: pointer;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                -webkit-tap-highlight-color: transparent;
+            `;
+            permissionBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const granted = await requestMotionPermission();
+                if (granted) {
+                    permissionBtn.style.display = 'none';
+                    motionIndicator.style.display = 'flex';
+                }
+            });
+            permissionBtn.addEventListener('touchend', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const granted = await requestMotionPermission();
+                if (granted) {
+                    permissionBtn.style.display = 'none';
+                    motionIndicator.style.display = 'flex';
+                }
+            });
+            document.body.appendChild(permissionBtn);
+        } else if (isMobile) {
+            // Android - auto enable
+            motionIndicator.style.display = 'flex';
+            requestMotionPermission();
+        }
+        
+        function enableMotionListeners() {
+            motionEnabled = true;
+            updateMotionStatus('активно ✓');
+            
+            // Device Orientation - for tilt-based aurora control
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            
+            // Device Motion - for shake detection
+            window.addEventListener('devicemotion', handleMotion, true);
+            
+            // Start animation loop for smooth updates
+            requestAnimationFrame(animateAurora);
+        }
+        
+        // Animation loop for smooth motion
+        function animateAurora() {
+            if (!motionEnabled && !orientationEnabled) {
+                requestAnimationFrame(animateAurora);
+                return;
+            }
+            
+            // Smooth interpolation
+            currentTiltX += (targetTiltX - currentTiltX) * 0.15;
+            currentTiltY += (targetTiltY - currentTiltY) * 0.15;
+            
+            // Move aurora based on tilt
+            const auroraShiftX = currentTiltX * 50;
+            const auroraShiftY = currentTiltY * 35;
+            
+            aurora.style.transform = `translate(${auroraShiftX}px, ${auroraShiftY}px)`;
+            
+            // Adjust wave intensity based on tilt
+            const tiltIntensity = Math.abs(currentTiltX) + Math.abs(currentTiltY);
+            aurora.style.opacity = 0.6 + tiltIntensity * 0.4;
+            
+            // Shift stars parallax (opposite direction)
+            starsContainer.style.transform = `translate(${-auroraShiftX * 0.4}px, ${-auroraShiftY * 0.4}px)`;
+            
+            // Update wave colors based on tilt direction
+            waves.forEach((wave, i) => {
+                const hueShift = currentTiltX * 40;
+                wave.style.filter = `hue-rotate(${hueShift + i * 15}deg)`;
+            });
+            
+            requestAnimationFrame(animateAurora);
+        }
+        
+        let orientationEventCount = 0;
+        
+        function handleOrientation(event) {
+            if (!motionEnabled) return;
+            
+            // beta: front-back tilt (-180 to 180)
+            // gamma: left-right tilt (-90 to 90)
+            // alpha: compass heading (0 to 360)
+            const beta = event.beta;
+            const gamma = event.gamma;
+            const alpha = event.alpha;
+            
+            // Check if we're getting valid data
+            if (beta === null && gamma === null) {
+                updateMotionStatus('нет данных гироскопа');
+                return;
+            }
+            
+            orientationEnabled = true;
+            orientationEventCount++;
+            
+            // Update status periodically
+            if (orientationEventCount % 30 === 0) {
+                updateMotionStatus(`активно ✓`);
+            }
+            
+            // Update debug
+            updateDebug(`β: ${beta?.toFixed(1) || 'null'}<br>γ: ${gamma?.toFixed(1) || 'null'}<br>α: ${alpha?.toFixed(1) || 'null'}<br>events: ${orientationEventCount}`);
+            
+            // Normalize values (-1 to 1)
+            // gamma: left(-90) to right(+90) tilt
+            // beta: forward(-180/180) to back(0) tilt, typically ~45 when holding phone
+            targetTiltX = Math.max(-1, Math.min(1, (gamma || 0) / 40));
+            targetTiltY = Math.max(-1, Math.min(1, ((beta || 0) - 45) / 40));
+        }
+        
+        // Shake detection variables
+        let lastAcceleration = { x: 0, y: 0, z: 0 };
+        let shakeThreshold = 20;
+        let lastShakeTime = 0;
+        
+        function handleMotion(event) {
+            if (!motionEnabled) return;
+            
+            const acceleration = event.accelerationIncludingGravity || event.acceleration;
+            if (!acceleration || (acceleration.x === null && acceleration.y === null)) return;
+            
+            const x = acceleration.x || 0;
+            const y = acceleration.y || 0;
+            const z = acceleration.z || 0;
+            
+            const deltaX = Math.abs(x - lastAcceleration.x);
+            const deltaY = Math.abs(y - lastAcceleration.y);
+            const deltaZ = Math.abs(z - lastAcceleration.z);
+            
+            const totalDelta = deltaX + deltaY + deltaZ;
+            
+            // Shake detected!
+            if (totalDelta > shakeThreshold) {
+                const now = Date.now();
+                if (now - lastShakeTime > 500) { // Debounce
+                    lastShakeTime = now;
+                    triggerShakeEffect();
+                }
+            }
+            
+            // Create ambient particles based on motion intensity
+            if (totalDelta > 5 && Math.random() > 0.8) {
+                createMotionParticle(totalDelta);
+            }
+            
+            lastAcceleration = {
+                x: x,
+                y: y,
+                z: z
+            };
+        }
+        
+        function triggerShakeEffect() {
+            // Flash effect
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: radial-gradient(circle at center, 
+                    rgba(0, 255, 136, 0.3), 
+                    transparent 70%);
+                z-index: 100;
+                pointer-events: none;
+                animation: flashFade 0.5s ease-out forwards;
+            `;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 500);
+            
+            // Create burst of particles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 12 + 6;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = Math.random() * window.innerHeight * 0.6 + 'px';
+                    
+                    const colors = ['#00ff88', '#00aaff', '#8855ff', '#ff44aa', '#ffffff'];
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.boxShadow = `0 0 15px ${particle.style.background}`;
+                    
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 30);
+            }
+            
+            // Temporarily boost aurora intensity
+            aurora.style.transition = 'all 0.3s ease';
+            aurora.style.opacity = '1';
+            aurora.style.filter = 'blur(25px)';
+            
+            setTimeout(() => {
+                aurora.style.opacity = '0.8';
+                aurora.style.filter = 'blur(40px)';
+            }, 300);
+            
+            // Vibrate if supported
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 30, 50]);
+            }
+            
+            // Create shooting star on shake
+            createShootingStar();
+            createShootingStar();
+        }
+        
+        function createMotionParticle(intensity) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 4 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = Math.random() * window.innerHeight * 0.5 + 'px';
+            
+            const colors = ['#00ff88', '#00aaff', '#8855ff'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.boxShadow = `0 0 8px ${particle.style.background}`;
+            particle.style.animationDuration = '1.5s';
+            
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 1500);
+        }
+        
+        // Add flash animation style
+        const flashStyle = document.createElement('style');
+        flashStyle.textContent = `
+            @keyframes flashFade {
+                0% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(flashStyle);
+        
+        // Touch-based aurora interaction (fallback for devices without gyro)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            // Ignore touches on controls
+            if (e.target.closest('.controls') || e.target.closest('button')) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', (e) => {
+            // Ignore touches on controls
+            if (e.target.closest('.controls') || e.target.closest('button')) return;
+            
+            if (!orientationEnabled) {
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
+                
+                const deltaX = (touchX - touchStartX) / window.innerWidth;
+                const deltaY = (touchY - touchStartY) / window.innerHeight;
+                
+                aurora.style.transform = `translate(${deltaX * 50}px, ${deltaY * 30}px)`;
+                starsContainer.style.transform = `translate(${-deltaX * 20}px, ${-deltaY * 15}px)`;
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            // Reset position if not using gyro
+            if (!orientationEnabled) {
+                aurora.style.transform = 'translate(0, 0)';
+                starsContainer.style.transform = 'translate(0, 0)';
+            }
+            
+            // Double tap to create burst effect (ignore controls)
+            if (e.target.closest('.controls') || e.target.closest('button')) return;
+            
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                // Double tap detected
+                const touch = e.changedTouches[0];
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        const size = Math.random() * 10 + 5;
+                        particle.style.width = size + 'px';
+                        particle.style.height = size + 'px';
+                        
+                        const angle = (i / 15) * Math.PI * 2;
+                        const distance = Math.random() * 60 + 20;
+                        particle.style.left = touch.clientX + Math.cos(angle) * distance + 'px';
+                        particle.style.top = touch.clientY + Math.sin(angle) * distance + 'px';
+                        
+                        const colors = ['#00ff88', '#00aaff', '#8855ff', '#ff44aa'];
+                        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        particle.style.boxShadow = `0 0 12px ${particle.style.background}`;
+                        
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 2000);
+                    }, i * 20);
+                }
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            }
+            lastTap = currentTime;
+        });
+        
+        let lastTap = 0;
+    </script>
+</body>
+</html>
